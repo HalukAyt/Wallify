@@ -1,6 +1,6 @@
-import React from "react";
-import HomeScreen from "../src/screens/HomeScreen";
+import React from 'react';
+import HomeScreen from '../src/screens/HomeScreen';
 
 export default function Index() {
-  return <HomeScreen />;
+  return <HomeScreen/>;
 }
