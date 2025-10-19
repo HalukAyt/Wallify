@@ -6,15 +6,15 @@ const isDev = __DEV__;
 
 // Her placement için iOS ve Android'de ayrı Unit ID kullanın:
 const IOS = {
-  bannerBottom: 'ca-app-pub-xxxxxxxxxxxxxxxx/iosBottomBannerId',
-  bannerInline: 'ca-app-pub-xxxxxxxxxxxxxxxx/iosInlineBannerId',
-  interstitial: 'ca-app-pub-xxxxxxxxxxxxxxxx/iosInterstitialId',
+  bannerBottom: 'ca-app-pub-6213254226131923/2303215422',
+  bannerInline: 'ca-app-pub-6213254226131923/9234814650',
+  interstitial: 'ca-app-pub-6213254226131923/7423680164',
 };
 
 const ANDROID = {
-  bannerBottom: 'ca-app-pub-xxxxxxxxxxxxxxxx/androidBottomBannerId',
-  bannerInline: 'ca-app-pub-xxxxxxxxxxxxxxxx/androidInlineBannerId',
-  interstitial: 'ca-app-pub-xxxxxxxxxxxxxxxx/androidInterstitialId',
+  bannerBottom: 'ca-app-pub-6213254226131923/1547896320',
+  bannerInline: 'ca-app-pub-6213254226131923/8736761838',
+  interstitial: 'ca-app-pub-6213254226131923/4929378763',
 };
 
 // DEV'de Google test ID'lerini kullan (store’a çıkmadan önce PROD id’lerle değişir)
