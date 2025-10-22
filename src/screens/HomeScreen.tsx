@@ -1,65 +1,69 @@
+import { router } from 'expo-router';
 import React, { useEffect, useRef } from 'react';
 import {
-  View,
+  Dimensions,
   FlatList,
   Image,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  Text,
   SafeAreaView,
-  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { router } from 'expo-router';
-import { WALLPAPERS } from '../data/wallpapers';
 import {
+  AdEventType,
   BannerAd,
   BannerAdSize,
   InterstitialAd,
-  AdEventType,
 } from 'react-native-google-mobile-ads';
 import { AD_UNIT_IDS } from '../ads/ids';
+import { WALLPAPERS } from '../data/wallpapers';
 
 const { width } = Dimensions.get('window');
 const GAP = 8;
 const NUM_COLS = 2;
 const ITEM_SIZE = (width - GAP * (NUM_COLS + 1)) / NUM_COLS;
-const BANNER_H = 60;
 
-// Interstitial reklamı oluştur
+// Interstitial reklam oluştur
 const interstitial = InterstitialAd.createForAdRequest(AD_UNIT_IDS.interstitial, {
   requestNonPersonalizedAdsOnly: false,
 });
 
 export default function HomeScreen() {
   const interstitialLoaded = useRef(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const loadedSub = interstitial.addAdEventListener(AdEventType.LOADED, () => {
       interstitialLoaded.current = true;
     });
+
     const closedSub = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
       interstitialLoaded.current = false;
-      interstitial.load(); // tekrar yükle
+      interstitial.load(); // reklam kapandıktan sonra yeniden yükle
     });
+
     interstitial.load();
+
+    // Her 60 saniyede bir interstitial göster (hazırsa)
+    intervalRef.current = setInterval(() => {
+      if (interstitialLoaded.current) {
+        interstitial.show();
+      }
+    }, 60 * 1000); // 1 dakika (60 saniye)
 
     return () => {
       loadedSub();
       closedSub();
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, []);
 
   const handlePress = (itemId: string) => {
-    // %50 olasılıkla interstitial göster
-    if (interstitialLoaded.current && Math.random() < 0.5) {
-      interstitial.show();
-    }
     router.push({ pathname: '/detail/[id]', params: { id: itemId } });
   };
 
   const renderItem = ({ item, index }: { item: any; index: number }) => {
-    // 4. öğeden sonra inline banner
     if (index === 2) {
       return (
         <View style={styles.inlineBanner}>
@@ -91,19 +95,9 @@ export default function HomeScreen() {
         data={WALLPAPERS}
         keyExtractor={(item) => item.id}
         numColumns={NUM_COLS}
-        contentContainerStyle={{ padding: GAP, paddingBottom: BANNER_H + 16 }}
+        contentContainerStyle={{ padding: GAP, paddingBottom: 16 }}
         renderItem={renderItem}
       />
-
-      {/* Alt sabit banner */}
-      <View style={styles.bannerBottom}>
-        <BannerAd
-          unitId={AD_UNIT_IDS.bannerBottom}
-          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-          requestOptions={{ requestNonPersonalizedAdsOnly: false }}
-          onAdFailedToLoad={(e) => console.log('Bottom banner failed:', e)}
-        />
-      </View>
     </SafeAreaView>
   );
 }
@@ -123,14 +117,5 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     marginVertical: 8,
-  },
-  bannerBottom: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingHorizontal: 8,
-    paddingBottom: Platform.select({ ios: 8, android: 8 }),
-    backgroundColor: '#0b0b0b',
   },
 });
